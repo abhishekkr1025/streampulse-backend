@@ -37,4 +37,4 @@ CREATE TABLE IF NOT EXISTS dead_letter_queue (
 
 SELECT create_hypertable('orders_raw',        'ingested_at', if_not_exists => TRUE);
 SELECT create_hypertable('orders_per_minute', 'window_start', if_not_exists => TRUE);
-SELECT create_hypertable('flagged_orders',    'timestamp',    if_not_exists => TRUE);
+SELECT create_hypertable('flagged_orders',    'created_at',    if_not_exists => TRUE);
