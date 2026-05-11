@@ -71,6 +71,21 @@ services:
     command: standalone
     mem_limit: 2g
 
+  metabase:
+    image: metabase/metabase:latest
+    ports:
+      - "3000:3000"
+    environment:
+      MB_DB_TYPE:   postgres
+      MB_DB_DBNAME: orders_analytics
+      MB_DB_PORT:   5432
+      MB_DB_USER:   admin
+      MB_DB_PASS:   password
+      MB_DB_HOST:   timescaledb
+    depends_on:
+      - timescaledb
+    restart: always
+
   producer:
     build: ./producer
     depends_on: [kafka]
