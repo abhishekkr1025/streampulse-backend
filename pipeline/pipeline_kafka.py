@@ -3,11 +3,15 @@ from kafka import KafkaConsumer
 import json, psycopg2, logging
 from datetime import datetime, timezone
 
+import os
+KAFKA_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
+DB_HOST       = os.getenv("DB_HOST", "localhost")
+
 logging.basicConfig(level=logging.INFO)
 
 # ── Database connection ────────────────────────────────────
 conn = psycopg2.connect(
-    host="localhost", port=5432,
+    host=DB_HOST, port=5432,
     dbname="orders_analytics",
     user="admin", password="password"
 )
@@ -17,7 +21,7 @@ cur = conn.cursor()
 # ── Kafka consumer ─────────────────────────────────────────
 consumer = KafkaConsumer(
     "orders-stream",
-    bootstrap_servers="localhost:9092",
+    bootstrap_servers=KAFKA_SERVERS,
     value_deserializer=lambda m: json.loads(m.decode("utf-8")),
     group_id="pipeline-consumer",
     auto_offset_reset="latest",

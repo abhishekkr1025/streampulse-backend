@@ -3,8 +3,11 @@ from kafka import KafkaProducer
 import json, random, time, uuid
 from datetime import datetime, timezone
 
+import os
+KAFKA_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
+
 producer = KafkaProducer(
-    bootstrap_servers="localhost:9092",
+    bootstrap_servers=KAFKA_SERVERS,
     value_serializer=lambda v: json.dumps(v).encode("utf-8")
 )
 

@@ -2,12 +2,14 @@
 # Runs every minute — replaces Airflow for aggregation
 import psycopg2, time, logging
 from datetime import datetime, timezone
+import os
+DB_HOST = os.getenv("DB_HOST", "localhost")
 
 logging.basicConfig(level=logging.INFO)
 
 def get_conn():
     return psycopg2.connect(
-        host="localhost", port=5432,
+        host=DB_HOST, port=5432,
         dbname="orders_analytics",
         user="admin", password="password"
     )
