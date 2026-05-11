@@ -1,7 +1,5 @@
 version: "3.9"
-
 services:
-
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
     environment:
@@ -17,7 +15,7 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://104.198.65.122:9092  # ← fix this
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
 
@@ -63,35 +61,32 @@ services:
     volumes:
       - ./airflow/dags:/opt/airflow/dags
     command: standalone
-    mem_limit: 2g
-    cpus: 1.0
+    mem_limit: 1.5g
 
-  metabase:
-    image: metabase/metabase:latest
-    ports:
-      - "3000:3000"
+  producer:
+    build: ./producer
+    depends_on: [kafka]
     environment:
-      MB_DB_TYPE:   postgres
-      MB_DB_DBNAME: orders_analytics
-      MB_DB_PORT:   5432
-      MB_DB_USER:   admin
-      MB_DB_PASS:   password
-      MB_DB_HOST:   timescaledb
-    depends_on: [timescaledb]
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    restart: always
 
-  # ── Your FastAPI backend ───────────────────────────────────
-  api:
-    build: .
+  pipeline:
+    build: ./pipeline
+    depends_on: [kafka, timescaledb]
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      DB_HOST: timescaledb
+    restart: always
+
+  backend:
+    build: ./backend
+    depends_on: [timescaledb]
     ports:
       - "8000:8000"
     environment:
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
-      - DB_HOST=timescaledb
-      - DB_USER=admin
-      - DB_PASSWORD=password
-      - DB_NAME=orders_analytics
-      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-    depends_on: [timescaledb, kafka]
+      DB_HOST: timescaledb
+      GEMINI_API_KEY: ${GEMINI_API_KEY}   # ✅ fixed
+    restart: always
 
 volumes:
   timescale_data:
