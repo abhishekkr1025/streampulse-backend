@@ -26,7 +26,7 @@ def generate_order(anomaly=False):
                           else random.uniform(80,1800), 2),
         "city":      random.choice(CITIES),
         "status":    random.choice(STATUSES),
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat(),
     }
 
 count = 0

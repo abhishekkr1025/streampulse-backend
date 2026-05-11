@@ -9,10 +9,10 @@ def fraud_alerts():
     cur  = conn.cursor()
     cur.execute("""
         SELECT order_id, user_id, amount,
-               city, flag_reason, timestamp
+               city, flag_reason, created_at
         FROM flagged_orders
-        WHERE timestamp >= NOW() - interval '2 hours'
-        ORDER BY timestamp DESC
+        WHERE created_at >= NOW() - interval '2 hours'
+        ORDER BY created_at DESC
         LIMIT 100
     """)
     rows = cur.fetchall()
@@ -24,7 +24,7 @@ def fraud_alerts():
             "amount":      float(r[2]),
             "city":        r[3],
             "flag_reason": r[4],
-            "timestamp":   str(r[5]),
+            "created_at":   str(r[5]),
         }
         for r in rows
     ]
@@ -38,7 +38,7 @@ def fraud_summary():
                COUNT(*)                       AS total,
                ROUND(AVG(amount)::numeric, 2) AS avg_amount
         FROM flagged_orders
-        WHERE timestamp >= date_trunc('day', NOW())
+        WHERE created_at >= date_trunc('day', NOW())
         GROUP BY flag_reason
     """)
     rows = cur.fetchall()

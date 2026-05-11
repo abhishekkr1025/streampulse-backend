@@ -41,25 +41,25 @@ def write_raw(order):
     cur.execute("""
         INSERT INTO orders_raw
         (order_id, user_id, product, amount, city,
-         status, timestamp, ingested_at)
+         status, created_at, ingested_at)
         VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
         ON CONFLICT DO NOTHING
     """, (
         order["order_id"], order["user_id"], order["product"],
         float(order["amount"]), order["city"],
-        order.get("status","unknown"), order["timestamp"],
+        order.get("status","unknown"), order["created_at"],
         datetime.now(timezone.utc)
     ))
 
 def write_fraud(order, reason):
     cur.execute("""
         INSERT INTO flagged_orders
-        (order_id, user_id, amount, city, flag_reason, timestamp)
+        (order_id, user_id, amount, city, flag_reason, created_at)
         VALUES (%s,%s,%s,%s,%s,%s)
     """, (
         order["order_id"], order["user_id"],
         float(order["amount"]), order["city"],
-        reason, order["timestamp"]
+        reason, order["created_at"]
     ))
 
 def write_dlq(raw, error, step):
@@ -82,7 +82,7 @@ for msg in consumer:
 
         # validate
         required = {"order_id","user_id","product",
-                    "amount","city","timestamp"}
+                    "amount","city","created_at"}
         missing  = required - set(order.keys())
         if missing:
             raise ValueError(f"Missing fields: {missing}")
