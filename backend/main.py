@@ -10,7 +10,7 @@ app = FastAPI(title="StreamPulse API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # or specify ["http://localhost:5173"]
+    allow_origins=["http://localhost:5173"],  # or specify ["http://localhost:5173"]
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
