@@ -30,6 +30,12 @@ services:
     volumes:
       - timescale_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+        test: ["CMD-SHELL", "pg_isready -U admin -d orders_analytics"]
+        interval: 10s
+        timeout: 5s
+        retries: 5
+    
 
   minio:
     image: minio/minio:latest
@@ -45,7 +51,9 @@ services:
 
   airflow:
     image: apache/airflow:2.8.0
-    depends_on: [timescaledb]
+    depends_on:
+      timescaledb:
+         condition: service_healthy   # waits until DB is ready
     ports:
       - "8082:8080"
     environment:
@@ -61,7 +69,7 @@ services:
     volumes:
       - ./airflow/dags:/opt/airflow/dags
     command: standalone
-    mem_limit: 1.5g
+    mem_limit: 2g
 
   producer:
     build: ./producer

@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS flagged_orders (
     amount      FLOAT,
     city        TEXT,
     flag_reason TEXT,
-    created_at   TIMESTAMPTZ
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW() 
 );
 
 CREATE TABLE IF NOT EXISTS dead_letter_queue (
