@@ -10,7 +10,7 @@ app = FastAPI(title="StreamPulse API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # or specify ["http://localhost:5173"]
+    allow_origins=["https://streampulse-dashboard.vercel.app", "http://localhost:5173"],  # or specify ["http://localhost:5173"]
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
